@@ -389,15 +389,69 @@ export const ChatAssistant = forwardRef<ChatAssistantRef, ChatAssistantProps>(
   const [addBudgetName, setAddBudgetName] = useState("");
   const [addBudgetAmount, setAddBudgetAmount] = useState("");
   const [addBudgetFrequency, setAddBudgetFrequency] = useState<"weekly" | "biweekly" | "monthly" | "yearly">("monthly");
-  const [addedBudgetItems, setAddedBudgetItems] = useState<Set<string>>(new Set());
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  
+  // Persist added budget items to localStorage so users can't spam add
+  const getStorageKey = () => `addedBudgetItems_${visitorId}`;
+  
+  const [addedBudgetItems, setAddedBudgetItems] = useState<Set<string>>(() => {
+    if (typeof window === "undefined" || !visitorId) return new Set();
+    try {
+      const stored = localStorage.getItem(getStorageKey());
+      if (stored) {
+        return new Set(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.error("Failed to load added budget items:", e);
     }
+    return new Set();
+  });
+
+  // Update localStorage whenever addedBudgetItems changes
+  useEffect(() => {
+    if (visitorId && addedBudgetItems.size > 0) {
+      try {
+        localStorage.setItem(getStorageKey(), JSON.stringify([...addedBudgetItems]));
+      } catch (e) {
+        console.error("Failed to save added budget items:", e);
+      }
+    }
+  }, [addedBudgetItems, visitorId]);
+
+  // Reload from localStorage when visitorId becomes available
+  useEffect(() => {
+    if (visitorId && typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem(getStorageKey());
+        if (stored) {
+          setAddedBudgetItems(new Set(JSON.parse(stored)));
+        }
+      } catch (e) {
+        console.error("Failed to load added budget items:", e);
+      }
+    }
+  }, [visitorId]);
+
+  // Scroll to the bottom of messages (latest message)
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  // Scroll to bottom when messages change or streaming content updates
+  useEffect(() => {
+    scrollToBottom();
   }, [messages, streamingContent]);
+
+  // Also scroll to bottom on initial load when messages exist
+  useEffect(() => {
+    if (messages.length > 0) {
+      // Use setTimeout to ensure DOM is ready
+      setTimeout(scrollToBottom, 100);
+    }
+  }, [messages.length > 0]);
 
   // Helper to convert to monthly
   const toMonthly = (amount: number, frequency: string): number => {
@@ -682,7 +736,7 @@ Debts: ${budgetData.debts.map(d => `${d.name}: RM${d.remainingAmount} at ${d.int
       {/* Messages Area - When there are messages */}
       {(messages.length > 0 || streamingContent) && (
         <div className="h-full pb-48 overflow-hidden">
-          <ScrollArea className="h-full" ref={scrollRef}>
+          <ScrollArea className="h-full">
             <div className="max-w-4xl mx-auto px-6 py-6 space-y-4">
                 {messages.map((message, index) => (
                   <motion.div
@@ -874,6 +928,9 @@ Debts: ${budgetData.debts.map(d => `${d.name}: RM${d.remainingAmount} at ${d.int
                     </div>
                   </motion.div>
                 )}
+                
+                {/* Scroll anchor - invisible element at the bottom */}
+                <div ref={messagesEndRef} />
             </div>
           </ScrollArea>
               </div>
