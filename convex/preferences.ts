@@ -72,3 +72,20 @@ export const updatePreferences = mutation({
   },
 });
 
+// Reset onboarding (for testing)
+export const resetOnboarding = mutation({
+  args: { visitorId: v.string() },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("userPreferences")
+      .withIndex("by_visitor", (q) => q.eq("visitorId", args.visitorId))
+      .first();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        hasCompletedOnboarding: false,
+      });
+    }
+  },
+});
+

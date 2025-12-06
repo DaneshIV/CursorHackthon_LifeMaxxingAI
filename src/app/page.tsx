@@ -105,7 +105,11 @@ export default function Home() {
   } : DEFAULT_BUDGET_DATA;
 
   const completedTasks: string[] = questProgress?.completedTasks || [];
-  const showOnboarding = preferences ? !preferences.hasCompletedOnboarding : true;
+  
+  // Wait for preferences to load before deciding onboarding state
+  // preferences === undefined means still loading
+  const preferencesLoaded = preferences !== undefined;
+  const showOnboarding = preferencesLoaded && !preferences.hasCompletedOnboarding;
 
   useEffect(() => {
     setMounted(true);
@@ -230,8 +234,8 @@ export default function Home() {
     await completeOnboardingMutation({ visitorId });
   };
 
-  // Don't render until mounted to avoid hydration mismatch
-  if (!mounted || !visitorId) {
+  // Don't render until mounted, visitorId loaded, and preferences loaded
+  if (!mounted || !visitorId || !preferencesLoaded) {
     return (
       <div className="min-h-screen gradient-warm noise flex items-center justify-center">
         <motion.div
