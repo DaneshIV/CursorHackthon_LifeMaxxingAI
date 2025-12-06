@@ -390,7 +390,7 @@ export const ChatAssistant = forwardRef<ChatAssistantRef, ChatAssistantProps>(
   const [addBudgetAmount, setAddBudgetAmount] = useState("");
   const [addBudgetFrequency, setAddBudgetFrequency] = useState<"weekly" | "biweekly" | "monthly" | "yearly">("monthly");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   
   // Persist added budget items to localStorage so users can't spam add
   const getStorageKey = () => `addedBudgetItems_${visitorId}`;
@@ -994,7 +994,7 @@ Debts: ${budgetData.debts.map(d => `${d.name}: RM${d.remainingAmount} at ${d.int
             {/* Input Row */}
             <div className="flex items-center px-4 py-3">
               <input
-                ref={textareaRef as React.RefObject<HTMLInputElement>}
+                ref={inputRef}
                 type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
