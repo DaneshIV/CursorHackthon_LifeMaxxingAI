@@ -14,6 +14,22 @@
 
 ---
 
+## 🏆 Sponsor Tracks
+
+<div align="center">
+  
+  [![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com)
+  [![Anthropic Claude](https://img.shields.io/badge/Anthropic_Claude-FF6B6B?style=for-the-badge&logo=anthropic&logoColor=white)](https://anthropic.com)
+  [![Mobbin](https://img.shields.io/badge/Mobbin-000000?style=for-the-badge&logo=mobbin&logoColor=white)](https://mobbin.com)
+  [![Convex](https://img.shields.io/badge/Convex-FF6B6B?style=for-the-badge&logo=convex&logoColor=white)](https://convex.dev)
+  [![Rytbank](https://img.shields.io/badge/Rytbank-0066CC?style=for-the-badge&logo=bank&logoColor=white)](https://rytbank.com)
+  [![CodeRabbit](https://img.shields.io/badge/CodeRabbit-FF6B6B?style=for-the-badge&logo=github&logoColor=white)](https://coderabbit.ai)
+  [![Cursor](https://img.shields.io/badge/Cursor-000000?style=for-the-badge&logo=cursor&logoColor=white)](https://cursor.sh)
+  
+</div>
+
+---
+
 ## ✨ Features
 
 ### 💬 Smart Life-Admin Chat Assistant
@@ -86,23 +102,41 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 
 ## 🛠 Tech Stack
 
+### 🖼️ Tech Stack Preview
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="TailwindCSS" />
+  <img src="https://img.shields.io/badge/Convex-FF6B6B?style=for-the-badge&logo=convex&logoColor=white" alt="Convex" />
+  <img src="https://img.shields.io/badge/Anthropic_Claude-FF6B6B?style=for-the-badge&logo=anthropic&logoColor=white" alt="Anthropic Claude" />
+  <img src="https://img.shields.io/badge/FramerMotion-EA4C89?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion" />
+  <img src="https://img.shields.io/badge/Radix_UI-000000?style=for-the-badge&logo=radixui&logoColor=white" alt="Radix UI" />
+  <img src="https://img.shields.io/badge/shadcn/ui-000000?style=for-the-badge&logo=shadcnui&logoColor=white" alt="shadcn/ui" />
+  <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" />
+</p>
+
 ### Frontend
 - **Next.js 16** — React framework with App Router
+- **React 19** — Latest React with modern features
 - **TypeScript** — Type safety
 - **Tailwind CSS 4** — Utility-first styling
 - **Framer Motion** — Smooth animations
-- **ShadCN UI** — Beautiful, accessible components
+- **Radix UI** — Accessible, unstyled components
+- **shadcn/ui** — Beautiful component library
 - **Lucide Icons** — Clean iconography
 
 ### Backend
-- **Vercel Serverless Functions** — API routes
-- **Claude AI (claude-sonnet-4-20250514)** — Language model
-- **pdf-parse** — PDF text extraction
+- **Convex** — Real-time database and backend functions
+- **Next.js API Routes** — Serverless endpoints
+- **Anthropic Claude (claude-sonnet-4-20250514)** — AI language model
+- **Claude Vision API** — Document and image analysis
 
 ### Features
 - **Streaming responses** — Real-time chat feedback
-- **LocalStorage persistence** — Insights survive refresh
-- **Vision API** — Extract text from images
+- **Real-time synchronization** — Data syncs instantly via Convex
+- **Vision API** — Extract text from PDFs and images
 - **Mobile-responsive** — Works on all devices
 
 ---
@@ -133,12 +167,15 @@ src/
 
 ## 🎯 Hackathon Tracks
 
-This project was built for a 24-hour hackathon and integrates:
+This project was built for a 24-hour hackathon and integrates the following sponsor tracks:
 
 - ✅ **Vercel** — Hosting + Serverless functions
-- ✅ **Claude AI** — Core LLM for chat and analysis
-- 🔄 **Groq** — (Optional) Fast embeddings for memory
-- 🔄 **ElevenLabs** — (Optional) Voice-to-task feature
+- ✅ **Anthropic Claude** — Core LLM for chat and document analysis
+- ✅ **Convex** — Real-time database and backend infrastructure
+- ✅ **Mobbin** — UI/UX design inspiration
+- ✅ **Rytbank** — Financial services integration
+- ✅ **CodeRabbit** — Code review and quality assurance
+- ✅ **Cursor** — AI-powered development environment
 
 ---
 
