@@ -1,6 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
-import { PDFParse } from "pdf-parse";
 
 const ANALYSIS_PROMPT = `You are LifeKit.AI, an AI document analyzer. Analyze the provided document text and extract key information to help the user understand and take action.
 
@@ -55,49 +54,39 @@ export async function POST(request: NextRequest) {
       // Plain text file
       extractedText = await file.text();
     } else if (fileName.endsWith(".pdf")) {
-      // PDF handling using pdf-parse v2
+      // PDF handling using Claude's document vision
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
+      const base64 = buffer.toString("base64");
       
-      try {
-        const parser = new PDFParse({ data: buffer });
-        const textResult = await parser.getText();
-        extractedText = textResult.text || "";
-        await parser.destroy();
-      } catch (pdfError) {
-        console.error("PDF parsing error:", pdfError);
-        // Fallback: send to Claude as base64 for vision
-        const base64 = buffer.toString("base64");
-        
-        // Use Claude's vision capabilities for PDF
-        const anthropic = new Anthropic({ apiKey });
-        const visionResponse = await anthropic.messages.create({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 2048,
-          messages: [
-            {
-              role: "user",
-              content: [
-                {
-                  type: "text",
-                  text: "Please extract and transcribe all the text content from this PDF document. Return just the extracted text, no commentary."
+      // Use Claude's vision capabilities for PDF
+      const anthropic = new Anthropic({ apiKey });
+      const visionResponse = await anthropic.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 2048,
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: "Please extract and transcribe all the text content from this PDF document. Return just the extracted text, no commentary."
+              },
+              {
+                type: "document",
+                source: {
+                  type: "base64",
+                  media_type: "application/pdf",
+                  data: base64,
                 },
-                {
-                  type: "document",
-                  source: {
-                    type: "base64",
-                    media_type: "application/pdf",
-                    data: base64,
-                  },
-                },
-              ],
-            },
-          ],
-        });
-        
-        const textContent = visionResponse.content.find((block) => block.type === "text");
-        extractedText = textContent && "text" in textContent ? textContent.text : "";
-      }
+              },
+            ],
+          },
+        ],
+      });
+      
+      const textContent = visionResponse.content.find((block) => block.type === "text");
+      extractedText = textContent && "text" in textContent ? textContent.text : "";
     } else if (fileName.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
       // Image file - use Claude's vision
       const arrayBuffer = await file.arrayBuffer();
