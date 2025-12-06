@@ -1,11 +1,15 @@
 # 🧠 LifeKit.AI — Your AI Life Admin Co-Pilot
 
 <div align="center">
-  <img src="public/og-image.png" alt="LifeKit.AI Banner" width="800" />
+  
+  **[🚀 Try Live Demo →](https://cursor-hackthon-life-maxxing-ai.vercel.app/)**
   
   **Stop dreading the boring stuff. Let AI handle your life admin.**
   
-  [Live Demo](#) • [Features](#features) • [Quick Start](#quick-start) • [Tech Stack](#tech-stack)
+  [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://cursor-hackthon-life-maxxing-ai.vercel.app/)
+  
+  [Features](#-features) • [Quick Start](#-quick-start) • [Tech Stack](#-tech-stack) • [GitHub](https://github.com/DaneshIV/CursorHackthon_LifeMaxxingAI)
+  
 </div>
 
 ---
