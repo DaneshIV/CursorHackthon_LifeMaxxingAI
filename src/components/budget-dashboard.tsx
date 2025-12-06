@@ -334,7 +334,8 @@ function AddTransactionDialog({
   trigger,
 }: {
   type: "income" | "expense";
-  onAdd: (data: IncomeSource | Expense) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onAdd: (data: any) => void;
   trigger: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);

@@ -100,8 +100,12 @@ export default function Home() {
     subscriptions: budgetDataQuery.subscriptions.map(s => ({
       ...s,
       frequency: s.frequency as "weekly" | "monthly" | "yearly",
+      category: s.category || "other",
     })),
-    savingsGoals: budgetDataQuery.savingsGoals,
+    savingsGoals: budgetDataQuery.savingsGoals.map(g => ({
+      ...g,
+      deadline: g.targetDate,
+    })),
     debts: budgetDataQuery.debts,
   } : DEFAULT_BUDGET_DATA;
 
@@ -217,15 +221,31 @@ export default function Home() {
         frequency: i.frequency,
       })),
       expenses: newBudgetData.expenses.map(e => ({
-        ...e,
+        id: e.id,
+        name: e.name,
+        amount: e.amount,
         category: e.category,
+        isRecurring: e.isRecurring,
         frequency: e.frequency,
+        dueDate: e.date,
       })),
       subscriptions: newBudgetData.subscriptions.map(s => ({
-        ...s,
+        id: s.id,
+        name: s.name,
+        amount: s.amount,
         frequency: s.frequency,
+        nextBillingDate: s.nextBillingDate,
+        canCancel: s.canCancel,
+        category: s.category,
       })),
-      savingsGoals: newBudgetData.savingsGoals,
+      savingsGoals: newBudgetData.savingsGoals.map(g => ({
+        id: g.id,
+        name: g.name,
+        targetAmount: g.targetAmount,
+        currentAmount: g.currentAmount,
+        targetDate: g.deadline || new Date().toISOString().split('T')[0],
+        monthlyContribution: g.monthlyContribution,
+      })),
       debts: newBudgetData.debts,
     });
   };
