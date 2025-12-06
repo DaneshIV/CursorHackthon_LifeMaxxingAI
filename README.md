@@ -186,4 +186,5 @@ MIT License — feel free to use this for your own projects!
   <strong>Made with ☕ and determination</strong>
   <br />
   <sub>Because adulting is hard, but it doesn't have to be.</sub>
+  <sub> UWU </sub>
 </div>
