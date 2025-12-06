@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-const VISITOR_ID_KEY = "adulting-os-visitor-id";
+const VISITOR_ID_KEY = "lifekit-ai-visitor-id";
 
 /**
  * Hook to get a persistent visitor ID.

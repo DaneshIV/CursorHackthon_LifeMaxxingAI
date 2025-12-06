@@ -838,7 +838,7 @@ export function QuestTracker({ insights, completedTasks, onToggleTask, visitorId
             </div>
             <h4 className="font-medium mb-1">No quests yet!</h4>
             <p className="text-sm text-muted-foreground">
-              Upload documents to unlock your adulting quests
+              Upload documents to unlock your life quests
             </p>
           </div>
         </CardContent>
@@ -872,7 +872,7 @@ export function QuestTracker({ insights, completedTasks, onToggleTask, visitorId
               <div className="flex items-center gap-2 mb-1">
                 <span className="font-semibold text-lg">Level {level}</span>
                 <span className="text-sm text-muted-foreground">
-                  {progress === 100 ? "Adulting Master!" : 
+                  {progress === 100 ? "Life Master!" : 
                    progress >= 75 ? "Almost There!" :
                    progress >= 50 ? "Making Progress!" :
                    progress >= 25 ? "Getting Started!" :
@@ -1051,7 +1051,7 @@ export function QuestTracker({ insights, completedTasks, onToggleTask, visitorId
               <Sparkles className="w-5 h-5 text-amber-500" />
             </div>
             <p className="text-sm text-amber-600">
-              You&apos;ve conquered your adulting tasks. You&apos;re officially a pro! 🎉
+              You&apos;ve conquered all your tasks. You&apos;re officially a pro! 🎉
             </p>
           </motion.div>
         )}

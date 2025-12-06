@@ -26,7 +26,6 @@ import {
   TrendingUp,
   X,
   Paperclip,
-  Mic,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -686,7 +685,7 @@ Debts: ${budgetData.debts.map(d => `${d.name}: RM${d.remainingAmount} at ${d.int
               What can I help you with?
             </h2>
         <p className="text-muted-foreground">
-              Ask me anything about adulting, finances, or life admin
+              Ask me anything about finances, life admin, or personal growth
             </p>
           </motion.div>
           
@@ -1009,22 +1008,27 @@ Debts: ${budgetData.debts.map(d => `${d.name}: RM${d.remainingAmount} at ${d.int
             disabled={isLoading}
           />
               
-              {/* Send/Mic Button */}
+              {/* Send Button */}
               {isLoading ? (
                 <div className="ml-2 w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
                   <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
                 </div>
-              ) : input.trim() ? (
+              ) : (
                 <button
                   type="submit"
-                  className="ml-2 w-9 h-9 rounded-full bg-primary hover:bg-primary/90 flex items-center justify-center transition-colors"
+                  disabled={!input.trim()}
+                  className={cn(
+                    "ml-2 w-9 h-9 rounded-full flex items-center justify-center transition-colors",
+                    input.trim() 
+                      ? "bg-primary hover:bg-primary/90" 
+                      : "bg-secondary cursor-not-allowed"
+                  )}
                 >
-                  <Send className="w-4 h-4 text-white" />
+                  <Send className={cn(
+                    "w-4 h-4",
+                    input.trim() ? "text-white" : "text-muted-foreground"
+                  )} />
                 </button>
-              ) : (
-                <div className="ml-2 w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
-                  <Mic className="w-4 h-4 text-muted-foreground" />
-                </div>
               )}
             </div>
             

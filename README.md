@@ -1,7 +1,7 @@
-# 🧠 AdultingOS — Your AI Life Admin Co-Pilot
+# 🧠 LifeKit.AI — Your AI Life Admin Co-Pilot
 
 <div align="center">
-  <img src="public/og-image.png" alt="AdultingOS Banner" width="800" />
+  <img src="public/og-image.png" alt="LifeKit.AI Banner" width="800" />
   
   **Stop dreading the boring stuff. Let AI handle your life admin.**
   
@@ -56,8 +56,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/adulting-os.git
-cd adulting-os
+git clone https://github.com/yourusername/lifekit-ai.git
+cd lifekit-ai
 
 # Install dependencies
 npm install

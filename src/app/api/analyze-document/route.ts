@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import { PDFParse } from "pdf-parse";
 
-const ANALYSIS_PROMPT = `You are AdultingOS, an AI document analyzer. Analyze the provided document text and extract key information to help the user understand and take action.
+const ANALYSIS_PROMPT = `You are LifeKit.AI, an AI document analyzer. Analyze the provided document text and extract key information to help the user understand and take action.
 
 Provide your analysis in the following JSON format (and ONLY this format, no additional text):
 {

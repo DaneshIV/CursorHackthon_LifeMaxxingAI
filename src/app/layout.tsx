@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { ConvexClientProvider } from "@/providers/convex-provider";
 
 export const metadata: Metadata = {
-  title: "AdultingOS - Your AI Life Admin Co-Pilot",
+  title: "LifeKit.AI - Your AI Life Admin Co-Pilot",
   description: "Handle life admin with AI. Scan documents, get insights, draft emails, and stay on top of your tasks.",
   icons: {
     icon: "/favicon.ico",

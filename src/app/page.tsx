@@ -302,7 +302,7 @@ export default function Home() {
               transition={{ delay: 0.2 }}
               className="text-4xl font-bold mb-3"
             >
-              Welcome to AdultingOS
+              Welcome to LifeKit.AI
             </motion.h1>
             
             <motion.p 
@@ -396,7 +396,7 @@ export default function Home() {
                 <Sparkles className="w-4 h-4 text-white" />
               </motion.div>
               <div>
-                <h1 className="text-base font-semibold tracking-tight">AdultingOS</h1>
+                <h1 className="text-base font-semibold tracking-tight">LifeKit.AI</h1>
               </div>
             </div>
 
