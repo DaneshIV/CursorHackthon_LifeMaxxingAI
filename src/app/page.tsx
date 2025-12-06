@@ -483,7 +483,7 @@ export default function Home() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-background rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-auto"
+              className="bg-background rounded-2xl shadow-2xl max-w-3xl w-full max-h-[80vh] overflow-auto"
             >
               <div className="p-4 border-b border-border flex items-center justify-between">
                 <h2 className="text-lg font-semibold">Upload Document</h2>

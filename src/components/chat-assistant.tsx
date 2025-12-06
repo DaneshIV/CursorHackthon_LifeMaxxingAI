@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Send, 
   Sparkles, 
-  User, 
   Loader2,
   Clipboard,
   Check,
@@ -27,10 +26,7 @@ import {
   TrendingUp,
   X,
   Paperclip,
-  Globe,
-  Settings,
   Mic,
-  ImageIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,6 +40,204 @@ import { DocumentInsight } from "@/app/page";
 import { BudgetData } from "@/components/budget-dashboard";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
+
+// Mini Pixel Avatar for chat - matches quest tracker character
+interface PixelAvatarProps {
+  skinTone?: string;
+  hairColor?: string;
+  hairStyle?: string;
+  shirtColor?: string;
+  pantsColor?: string;
+  shoeColor?: string;
+  bodyStyle?: string;
+  accessory?: string;
+  size?: number;
+}
+
+const PixelAvatar = ({ 
+  skinTone = "#FFD5B8", 
+  hairColor = "#4A3728", 
+  hairStyle = "short",
+  shirtColor = "#C4654A",
+  pantsColor = "#5B8C6E",
+  shoeColor = "#4A3728",
+  bodyStyle = "masculine",
+  accessory,
+  size = 32 
+}: PixelAvatarProps) => {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 20 24"
+      className="pixelated"
+      style={{ imageRendering: "pixelated", background: "#F0EDE8", borderRadius: "6px" }}
+    >
+      {/* Accessory - Cap (behind hair) */}
+      {accessory === "cap" && (
+        <>
+          <rect x="4" y="0" width="12" height="1" fill="#C44A4A" />
+          <rect x="3" y="1" width="14" height="2" fill="#C44A4A" />
+        </>
+      )}
+
+      {/* Accessory - Hair Bow (behind hair) */}
+      {accessory === "bow" && (
+        <>
+          <rect x="13" y="2" width="3" height="2" fill="#E889B8" />
+          <rect x="14" y="1" width="1" height="1" fill="#E889B8" />
+          <rect x="14" y="4" width="1" height="1" fill="#E889B8" />
+        </>
+      )}
+      
+      {/* Hair - Different styles */}
+      {hairStyle === "short" || hairStyle === "default" ? (
+        <>
+          <rect x="6" y="1" width="8" height="1" fill={hairColor} />
+          <rect x="5" y="2" width="10" height="1" fill={hairColor} />
+          <rect x="5" y="3" width="10" height="2" fill={hairColor} />
+        </>
+      ) : hairStyle === "spiky" ? (
+        <>
+          <rect x="7" y="0" width="2" height="1" fill={hairColor} />
+          <rect x="11" y="0" width="2" height="1" fill={hairColor} />
+          <rect x="6" y="1" width="8" height="1" fill={hairColor} />
+          <rect x="5" y="2" width="10" height="1" fill={hairColor} />
+          <rect x="5" y="3" width="10" height="2" fill={hairColor} />
+        </>
+      ) : hairStyle === "long" ? (
+        <>
+          <rect x="6" y="1" width="8" height="1" fill={hairColor} />
+          <rect x="5" y="2" width="10" height="1" fill={hairColor} />
+          <rect x="5" y="3" width="10" height="2" fill={hairColor} />
+          <rect x="4" y="5" width="2" height="6" fill={hairColor} />
+          <rect x="14" y="5" width="2" height="6" fill={hairColor} />
+        </>
+      ) : hairStyle === "ponytail" ? (
+        <>
+          <rect x="6" y="1" width="8" height="1" fill={hairColor} />
+          <rect x="5" y="2" width="10" height="1" fill={hairColor} />
+          <rect x="5" y="3" width="10" height="2" fill={hairColor} />
+          <rect x="14" y="4" width="2" height="2" fill={hairColor} />
+          <rect x="15" y="6" width="2" height="4" fill={hairColor} />
+        </>
+      ) : hairStyle === "pigtails" ? (
+        <>
+          <rect x="6" y="1" width="8" height="1" fill={hairColor} />
+          <rect x="5" y="2" width="10" height="1" fill={hairColor} />
+          <rect x="5" y="3" width="10" height="2" fill={hairColor} />
+          <rect x="3" y="4" width="2" height="2" fill={hairColor} />
+          <rect x="2" y="6" width="2" height="5" fill={hairColor} />
+          <rect x="15" y="4" width="2" height="2" fill={hairColor} />
+          <rect x="16" y="6" width="2" height="5" fill={hairColor} />
+        </>
+      ) : hairStyle === "bun" ? (
+        <>
+          <rect x="7" y="0" width="6" height="1" fill={hairColor} />
+          <rect x="6" y="1" width="8" height="1" fill={hairColor} />
+          <rect x="5" y="2" width="10" height="1" fill={hairColor} />
+          <rect x="5" y="3" width="10" height="2" fill={hairColor} />
+        </>
+      ) : (
+        <>
+          <rect x="6" y="1" width="8" height="1" fill={hairColor} />
+          <rect x="5" y="2" width="10" height="1" fill={hairColor} />
+          <rect x="5" y="3" width="10" height="2" fill={hairColor} />
+        </>
+      )}
+      
+      {/* Face */}
+      <rect x="6" y="5" width="8" height="1" fill={skinTone} />
+      <rect x="5" y="6" width="10" height="4" fill={skinTone} />
+
+      {/* Earrings accessory */}
+      {accessory === "earrings" && (
+        <>
+          <rect x="4" y="8" width="1" height="2" fill="#FFD700" />
+          <rect x="15" y="8" width="1" height="2" fill="#FFD700" />
+        </>
+      )}
+      
+      {/* Eyes */}
+      {bodyStyle === "feminine" ? (
+        <>
+          <rect x="7" y="7" width="2" height="2" fill="#2D2A26" />
+          <rect x="11" y="7" width="2" height="2" fill="#2D2A26" />
+          <rect x="6" y="7" width="1" height="1" fill="#2D2A26" />
+          <rect x="13" y="7" width="1" height="1" fill="#2D2A26" />
+          <rect x="7" y="7" width="1" height="1" fill="#FFFFFF" />
+          <rect x="11" y="7" width="1" height="1" fill="#FFFFFF" />
+        </>
+      ) : (
+        <>
+          <rect x="7" y="7" width="2" height="2" fill="#2D2A26" />
+          <rect x="11" y="7" width="2" height="2" fill="#2D2A26" />
+          <rect x="7" y="7" width="1" height="1" fill="#FFFFFF" />
+          <rect x="11" y="7" width="1" height="1" fill="#FFFFFF" />
+        </>
+      )}
+      
+      {/* Glasses accessory */}
+      {accessory === "glasses" && (
+        <>
+          <rect x="6" y="7" width="4" height="2" fill="none" stroke="#2D2A26" strokeWidth="0.5" />
+          <rect x="10" y="7" width="4" height="2" fill="none" stroke="#2D2A26" strokeWidth="0.5" />
+        </>
+      )}
+      
+      {/* Headphones accessory */}
+      {accessory === "headphones" && (
+        <>
+          <rect x="4" y="3" width="1" height="5" fill="#2D2A26" />
+          <rect x="15" y="3" width="1" height="5" fill="#2D2A26" />
+          <rect x="3" y="6" width="2" height="3" fill="#4A4A4A" />
+          <rect x="15" y="6" width="2" height="3" fill="#4A4A4A" />
+        </>
+      )}
+      
+      {/* Mouth - happy smile */}
+      <rect x="8" y="9" width="4" height="1" fill="#E8936E" />
+      
+      {/* Body/Shirt */}
+      {bodyStyle === "feminine" ? (
+        <>
+          <rect x="6" y="11" width="8" height="1" fill={shirtColor} />
+          <rect x="5" y="12" width="10" height="3" fill={shirtColor} />
+          <rect x="4" y="15" width="12" height="2" fill={shirtColor} />
+          <rect x="3" y="17" width="14" height="1" fill={shirtColor} />
+        </>
+      ) : (
+        <>
+          <rect x="6" y="11" width="8" height="1" fill={shirtColor} />
+          <rect x="5" y="12" width="10" height="4" fill={shirtColor} />
+        </>
+      )}
+      
+      {/* Arms */}
+      <rect x="3" y="12" width="2" height="3" fill={skinTone} />
+      <rect x="15" y="12" width="2" height="3" fill={skinTone} />
+      
+      {/* Lower body */}
+      {bodyStyle === "feminine" ? (
+        <>
+          <rect x="7" y="18" width="2" height="4" fill={skinTone} />
+          <rect x="11" y="18" width="2" height="4" fill={skinTone} />
+          <rect x="6" y="22" width="3" height="2" fill={shoeColor} />
+          <rect x="11" y="22" width="3" height="2" fill={shoeColor} />
+        </>
+      ) : (
+        <>
+          <rect x="5" y="16" width="10" height="1" fill="#E8B94A" />
+          <rect x="6" y="17" width="8" height="3" fill={pantsColor} />
+          <rect x="6" y="20" width="3" height="2" fill={pantsColor} />
+          <rect x="11" y="20" width="3" height="2" fill={pantsColor} />
+          <rect x="5" y="22" width="4" height="2" fill={shoeColor} />
+          <rect x="11" y="22" width="4" height="2" fill={shoeColor} />
+        </>
+      )}
+    </svg>
+  );
+};
 
 type ExpenseCategory = 
   | "housing" 
@@ -169,6 +363,12 @@ export const ChatAssistant = forwardRef<ChatAssistantRef, ChatAssistantProps>(
   );
   const addMessageMutation = useMutation(api.chat.addMessage);
   const clearMessagesMutation = useMutation(api.chat.clearMessages);
+  
+  // Get character customization for avatar
+  const characterCustomization = useQuery(
+    api.quests.getCharacterCustomization,
+    visitorId ? { visitorId } : "skip"
+  );
   
   // Transform Convex messages to local format
   const messages: Message[] = (convexMessages || []).map((msg) => ({
@@ -619,8 +819,18 @@ Debts: ${budgetData.debts.map(d => `${d.name}: RM${d.remainingAmount} at ${d.int
                     </div>
 
                     {message.role === "user" && (
-                      <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
-                        <User className="w-4 h-4 text-muted-foreground" />
+                      <div className="w-8 h-8 rounded-lg flex-shrink-0 overflow-hidden shadow-sm">
+                        <PixelAvatar 
+                          skinTone={characterCustomization?.skinTone}
+                          hairColor={characterCustomization?.hairColor}
+                          hairStyle={characterCustomization?.hairStyle}
+                          shirtColor={characterCustomization?.shirtColor}
+                          pantsColor={characterCustomization?.pantsColor}
+                          shoeColor={characterCustomization?.shoeColor}
+                          bodyStyle={characterCustomization?.bodyStyle}
+                          accessory={characterCustomization?.accessory}
+                          size={32}
+                        />
                       </div>
                     )}
                   </motion.div>

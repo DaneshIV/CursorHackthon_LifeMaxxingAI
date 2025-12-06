@@ -112,5 +112,18 @@ export default defineSchema({
     theme: v.optional(v.string()),
     currency: v.optional(v.string()),
   }).index("by_visitor", ["visitorId"]),
+
+  // Character customization
+  characterCustomization: defineTable({
+    visitorId: v.string(),
+    skinTone: v.string(),
+    hairColor: v.string(),
+    hairStyle: v.string(),
+    shirtColor: v.string(),
+    pantsColor: v.string(),
+    shoeColor: v.string(),
+    accessory: v.optional(v.string()),
+    bodyStyle: v.optional(v.string()), // Optional for backwards compatibility
+  }).index("by_visitor", ["visitorId"]),
 });
 

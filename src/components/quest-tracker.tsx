@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Check,
@@ -11,11 +11,14 @@ import {
   Calendar,
   Star,
   Zap,
+  Palette,
+  X,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { DocumentInsight } from "@/app/page";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
 interface QuestTrackerProps {
@@ -34,8 +37,95 @@ interface Task {
   type: "action" | "date" | "step";
 }
 
+interface CharacterColors {
+  skinTone: string;
+  hairColor: string;
+  hairStyle: string;
+  shirtColor: string;
+  pantsColor: string;
+  shoeColor: string;
+  accessory?: string;
+  bodyStyle: "masculine" | "feminine";
+}
+
+// Color options for customization
+const SKIN_TONES = [
+  { id: "light", color: "#FFD5B8", label: "Light" },
+  { id: "fair", color: "#F5C9A6", label: "Fair" },
+  { id: "medium", color: "#D4A574", label: "Medium" },
+  { id: "tan", color: "#C49A6C", label: "Tan" },
+  { id: "brown", color: "#8D5524", label: "Brown" },
+  { id: "dark", color: "#5C3A21", label: "Dark" },
+];
+
+const HAIR_COLORS = [
+  { id: "brown", color: "#4A3728", label: "Brown" },
+  { id: "black", color: "#1A1A1A", label: "Black" },
+  { id: "blonde", color: "#E8C872", label: "Blonde" },
+  { id: "red", color: "#8B3A3A", label: "Red" },
+  { id: "gray", color: "#808080", label: "Gray" },
+  { id: "blue", color: "#4A6FA5", label: "Blue" },
+  { id: "pink", color: "#E889B8", label: "Pink" },
+  { id: "purple", color: "#7B4B94", label: "Purple" },
+];
+
+const SHIRT_COLORS = [
+  { id: "orange", color: "#C4654A", label: "Orange" },
+  { id: "red", color: "#C44A4A", label: "Red" },
+  { id: "blue", color: "#4A6FC4", label: "Blue" },
+  { id: "green", color: "#4AC46F", label: "Green" },
+  { id: "purple", color: "#8B4AC4", label: "Purple" },
+  { id: "pink", color: "#C44A8B", label: "Pink" },
+  { id: "yellow", color: "#C4B44A", label: "Yellow" },
+  { id: "white", color: "#E8E8E8", label: "White" },
+];
+
+const PANTS_COLORS = [
+  { id: "green", color: "#5B8C6E", label: "Green" },
+  { id: "blue", color: "#4A6B8C", label: "Blue" },
+  { id: "black", color: "#2D2D2D", label: "Black" },
+  { id: "brown", color: "#6B5344", label: "Brown" },
+  { id: "gray", color: "#6B6B6B", label: "Gray" },
+  { id: "red", color: "#8C4A4A", label: "Red" },
+  { id: "purple", color: "#6B4A8C", label: "Purple" },
+  { id: "khaki", color: "#A69A7C", label: "Khaki" },
+];
+
+const ACCESSORIES = [
+  { id: "none", label: "None", icon: "❌" },
+  { id: "glasses", label: "Glasses", icon: "👓" },
+  { id: "cap", label: "Cap", icon: "🧢" },
+  { id: "headphones", label: "Headphones", icon: "🎧" },
+  { id: "bow", label: "Hair Bow", icon: "🎀" },
+  { id: "earrings", label: "Earrings", icon: "💎" },
+];
+
+const BODY_STYLES = [
+  { id: "masculine", label: "Male", icon: "♂" },
+  { id: "feminine", label: "Female", icon: "♀" },
+];
+
+const HAIR_STYLES = [
+  { id: "short", label: "Short", forBody: "all" },
+  { id: "spiky", label: "Spiky", forBody: "all" },
+  { id: "long", label: "Long", forBody: "all" },
+  { id: "ponytail", label: "Ponytail", forBody: "all" },
+  { id: "pigtails", label: "Pigtails", forBody: "all" },
+  { id: "bun", label: "Bun", forBody: "all" },
+];
+
 // Pixel art character SVG - different states based on progress
-const PixelCharacter = ({ progress, level }: { progress: number; level: number }) => {
+const PixelCharacter = ({ 
+  progress, 
+  level, 
+  colors,
+  onCustomize 
+}: { 
+  progress: number; 
+  level: number;
+  colors: CharacterColors;
+  onCustomize?: () => void;
+}) => {
   const getCharacterState = () => {
     if (progress === 100) return "celebrating";
     if (progress >= 75) return "excited";
@@ -47,7 +137,18 @@ const PixelCharacter = ({ progress, level }: { progress: number; level: number }
   const state = getCharacterState();
 
   return (
-    <div className="relative">
+    <div className="relative group">
+      {/* Customize button */}
+      {onCustomize && (
+        <button
+          onClick={onCustomize}
+          className="absolute -bottom-1 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10 px-2 py-0.5 rounded-full bg-primary text-white text-[10px] font-medium flex items-center gap-1 shadow-lg"
+        >
+          <Palette className="w-3 h-3" />
+          Edit
+        </button>
+      )}
+      
       {/* Character Container */}
       <motion.div
         animate={
@@ -62,7 +163,8 @@ const PixelCharacter = ({ progress, level }: { progress: number; level: number }
           repeat: Infinity,
           ease: "easeInOut",
         }}
-        className="relative"
+        className="relative cursor-pointer"
+        onClick={onCustomize}
       >
         {/* Pixel Art Character */}
         <svg
@@ -72,21 +174,142 @@ const PixelCharacter = ({ progress, level }: { progress: number; level: number }
           className="pixelated"
           style={{ imageRendering: "pixelated" }}
         >
-          {/* Hair */}
-          <rect x="6" y="1" width="8" height="1" fill="#4A3728" />
-          <rect x="5" y="2" width="10" height="1" fill="#4A3728" />
-          <rect x="5" y="3" width="10" height="2" fill="#4A3728" />
+          {/* Accessory - Cap (behind hair) */}
+          {colors.accessory === "cap" && (
+            <>
+              <rect x="4" y="0" width="12" height="1" fill="#C44A4A" />
+              <rect x="3" y="1" width="14" height="2" fill="#C44A4A" />
+            </>
+          )}
+
+          {/* Accessory - Hair Bow (behind hair) */}
+          {colors.accessory === "bow" && (
+            <>
+              <rect x="13" y="2" width="3" height="2" fill="#E889B8" />
+              <rect x="14" y="1" width="1" height="1" fill="#E889B8" />
+              <rect x="14" y="4" width="1" height="1" fill="#E889B8" />
+            </>
+          )}
+          
+          {/* Hair - Different styles */}
+          {colors.hairStyle === "short" || colors.hairStyle === "default" ? (
+            // Short hair (default masculine style)
+            <>
+              <rect x="6" y="1" width="8" height="1" fill={colors.hairColor} />
+              <rect x="5" y="2" width="10" height="1" fill={colors.hairColor} />
+              <rect x="5" y="3" width="10" height="2" fill={colors.hairColor} />
+            </>
+          ) : colors.hairStyle === "spiky" ? (
+            // Spiky hair
+            <>
+              <rect x="7" y="0" width="2" height="1" fill={colors.hairColor} />
+              <rect x="11" y="0" width="2" height="1" fill={colors.hairColor} />
+              <rect x="6" y="1" width="8" height="1" fill={colors.hairColor} />
+              <rect x="5" y="2" width="10" height="1" fill={colors.hairColor} />
+              <rect x="5" y="3" width="10" height="2" fill={colors.hairColor} />
+            </>
+          ) : colors.hairStyle === "long" ? (
+            // Long hair
+            <>
+              <rect x="6" y="1" width="8" height="1" fill={colors.hairColor} />
+              <rect x="5" y="2" width="10" height="1" fill={colors.hairColor} />
+              <rect x="5" y="3" width="10" height="2" fill={colors.hairColor} />
+              <rect x="4" y="5" width="2" height="6" fill={colors.hairColor} />
+              <rect x="14" y="5" width="2" height="6" fill={colors.hairColor} />
+              <rect x="3" y="7" width="1" height="4" fill={colors.hairColor} />
+              <rect x="16" y="7" width="1" height="4" fill={colors.hairColor} />
+            </>
+          ) : colors.hairStyle === "ponytail" ? (
+            // Ponytail
+            <>
+              <rect x="6" y="1" width="8" height="1" fill={colors.hairColor} />
+              <rect x="5" y="2" width="10" height="1" fill={colors.hairColor} />
+              <rect x="5" y="3" width="10" height="2" fill={colors.hairColor} />
+              <rect x="14" y="4" width="2" height="2" fill={colors.hairColor} />
+              <rect x="15" y="6" width="2" height="4" fill={colors.hairColor} />
+              <rect x="16" y="10" width="1" height="2" fill={colors.hairColor} />
+            </>
+          ) : colors.hairStyle === "pigtails" ? (
+            // Pigtails
+            <>
+              <rect x="6" y="1" width="8" height="1" fill={colors.hairColor} />
+              <rect x="5" y="2" width="10" height="1" fill={colors.hairColor} />
+              <rect x="5" y="3" width="10" height="2" fill={colors.hairColor} />
+              <rect x="3" y="4" width="2" height="2" fill={colors.hairColor} />
+              <rect x="2" y="6" width="2" height="5" fill={colors.hairColor} />
+              <rect x="15" y="4" width="2" height="2" fill={colors.hairColor} />
+              <rect x="16" y="6" width="2" height="5" fill={colors.hairColor} />
+            </>
+          ) : colors.hairStyle === "bun" ? (
+            // Bun
+            <>
+              <rect x="7" y="0" width="6" height="1" fill={colors.hairColor} />
+              <rect x="8" y="-1" width="4" height="1" fill={colors.hairColor} />
+              <rect x="6" y="1" width="8" height="1" fill={colors.hairColor} />
+              <rect x="5" y="2" width="10" height="1" fill={colors.hairColor} />
+              <rect x="5" y="3" width="10" height="2" fill={colors.hairColor} />
+            </>
+          ) : (
+            // Default fallback
+            <>
+              <rect x="6" y="1" width="8" height="1" fill={colors.hairColor} />
+              <rect x="5" y="2" width="10" height="1" fill={colors.hairColor} />
+              <rect x="5" y="3" width="10" height="2" fill={colors.hairColor} />
+            </>
+          )}
           
           {/* Face */}
-          <rect x="6" y="5" width="8" height="1" fill="#FFD5B8" />
-          <rect x="5" y="6" width="10" height="4" fill="#FFD5B8" />
+          <rect x="6" y="5" width="8" height="1" fill={colors.skinTone} />
+          <rect x="5" y="6" width="10" height="4" fill={colors.skinTone} />
+
+          {/* Earrings accessory */}
+          {colors.accessory === "earrings" && (
+            <>
+              <rect x="4" y="8" width="1" height="2" fill="#FFD700" />
+              <rect x="15" y="8" width="1" height="2" fill="#FFD700" />
+            </>
+          )}
           
-          {/* Eyes */}
-          <rect x="7" y="7" width="2" height="2" fill="#2D2A26" />
-          <rect x="11" y="7" width="2" height="2" fill="#2D2A26" />
-          {/* Eye shine */}
-          <rect x="7" y="7" width="1" height="1" fill="#FFFFFF" />
-          <rect x="11" y="7" width="1" height="1" fill="#FFFFFF" />
+          {/* Eyes - slightly different for feminine style */}
+          {colors.bodyStyle === "feminine" ? (
+            <>
+              <rect x="7" y="7" width="2" height="2" fill="#2D2A26" />
+              <rect x="11" y="7" width="2" height="2" fill="#2D2A26" />
+              {/* Longer eyelashes for feminine style */}
+              <rect x="6" y="7" width="1" height="1" fill="#2D2A26" />
+              <rect x="13" y="7" width="1" height="1" fill="#2D2A26" />
+              {/* Eye shine */}
+              <rect x="7" y="7" width="1" height="1" fill="#FFFFFF" />
+              <rect x="11" y="7" width="1" height="1" fill="#FFFFFF" />
+            </>
+          ) : (
+            <>
+              <rect x="7" y="7" width="2" height="2" fill="#2D2A26" />
+              <rect x="11" y="7" width="2" height="2" fill="#2D2A26" />
+              {/* Eye shine */}
+              <rect x="7" y="7" width="1" height="1" fill="#FFFFFF" />
+              <rect x="11" y="7" width="1" height="1" fill="#FFFFFF" />
+            </>
+          )}
+          
+          {/* Glasses accessory */}
+          {colors.accessory === "glasses" && (
+            <>
+              <rect x="6" y="7" width="4" height="2" fill="none" stroke="#2D2A26" strokeWidth="0.5" />
+              <rect x="10" y="7" width="4" height="2" fill="none" stroke="#2D2A26" strokeWidth="0.5" />
+              <rect x="10" y="7.5" width="0.5" height="1" fill="#2D2A26" />
+            </>
+          )}
+          
+          {/* Headphones accessory */}
+          {colors.accessory === "headphones" && (
+            <>
+              <rect x="4" y="3" width="1" height="5" fill="#2D2A26" />
+              <rect x="15" y="3" width="1" height="5" fill="#2D2A26" />
+              <rect x="3" y="6" width="2" height="3" fill="#4A4A4A" />
+              <rect x="15" y="6" width="2" height="3" fill="#4A4A4A" />
+            </>
+          )}
           
           {/* Mouth - changes with state */}
           {state === "celebrating" || state === "excited" ? (
@@ -100,36 +323,64 @@ const PixelCharacter = ({ progress, level }: { progress: number; level: number }
             <rect x="9" y="9" width="2" height="1" fill="#C4654A" />
           )}
           
-          {/* Body/Shirt */}
-          <rect x="6" y="11" width="8" height="1" fill="#C4654A" />
-          <rect x="5" y="12" width="10" height="4" fill="#C4654A" />
+          {/* Body/Shirt - Different for body styles */}
+          {colors.bodyStyle === "feminine" ? (
+            // Feminine body - dress/skirt option
+            <>
+              <rect x="6" y="11" width="8" height="1" fill={colors.shirtColor} />
+              <rect x="5" y="12" width="10" height="3" fill={colors.shirtColor} />
+              {/* Skirt flare */}
+              <rect x="4" y="15" width="12" height="2" fill={colors.shirtColor} />
+              <rect x="3" y="17" width="14" height="1" fill={colors.shirtColor} />
+            </>
+          ) : (
+            // Masculine body - standard shirt
+            <>
+              <rect x="6" y="11" width="8" height="1" fill={colors.shirtColor} />
+              <rect x="5" y="12" width="10" height="4" fill={colors.shirtColor} />
+            </>
+          )}
           
           {/* Arms */}
           {state === "celebrating" ? (
             <>
-              <rect x="3" y="11" width="2" height="1" fill="#FFD5B8" />
-              <rect x="2" y="10" width="2" height="1" fill="#FFD5B8" />
-              <rect x="15" y="11" width="2" height="1" fill="#FFD5B8" />
-              <rect x="16" y="10" width="2" height="1" fill="#FFD5B8" />
+              <rect x="3" y="11" width="2" height="1" fill={colors.skinTone} />
+              <rect x="2" y="10" width="2" height="1" fill={colors.skinTone} />
+              <rect x="15" y="11" width="2" height="1" fill={colors.skinTone} />
+              <rect x="16" y="10" width="2" height="1" fill={colors.skinTone} />
             </>
           ) : (
             <>
-              <rect x="3" y="12" width="2" height="3" fill="#FFD5B8" />
-              <rect x="15" y="12" width="2" height="3" fill="#FFD5B8" />
+              <rect x="3" y="12" width="2" height="3" fill={colors.skinTone} />
+              <rect x="15" y="12" width="2" height="3" fill={colors.skinTone} />
             </>
           )}
           
-          {/* Belt */}
-          <rect x="5" y="16" width="10" height="1" fill="#E8B94A" />
-          
-          {/* Pants */}
-          <rect x="6" y="17" width="8" height="3" fill="#5B8C6E" />
-          <rect x="6" y="20" width="3" height="2" fill="#5B8C6E" />
-          <rect x="11" y="20" width="3" height="2" fill="#5B8C6E" />
-          
-          {/* Shoes */}
-          <rect x="5" y="22" width="4" height="2" fill="#4A3728" />
-          <rect x="11" y="22" width="4" height="2" fill="#4A3728" />
+          {/* Lower body - different for body styles */}
+          {colors.bodyStyle === "feminine" ? (
+            // Feminine - legs visible under dress
+            <>
+              {/* Legs */}
+              <rect x="7" y="18" width="2" height="4" fill={colors.skinTone} />
+              <rect x="11" y="18" width="2" height="4" fill={colors.skinTone} />
+              {/* Shoes */}
+              <rect x="6" y="22" width="3" height="2" fill={colors.shoeColor} />
+              <rect x="11" y="22" width="3" height="2" fill={colors.shoeColor} />
+            </>
+          ) : (
+            // Masculine - standard pants and shoes
+            <>
+              {/* Belt */}
+              <rect x="5" y="16" width="10" height="1" fill="#E8B94A" />
+              {/* Pants */}
+              <rect x="6" y="17" width="8" height="3" fill={colors.pantsColor} />
+              <rect x="6" y="20" width="3" height="2" fill={colors.pantsColor} />
+              <rect x="11" y="20" width="3" height="2" fill={colors.pantsColor} />
+              {/* Shoes */}
+              <rect x="5" y="22" width="4" height="2" fill={colors.shoeColor} />
+              <rect x="11" y="22" width="4" height="2" fill={colors.shoeColor} />
+            </>
+          )}
         </svg>
 
         {/* Level badge */}
@@ -171,6 +422,273 @@ const PixelCharacter = ({ progress, level }: { progress: number; level: number }
   );
 };
 
+// Character Customization Modal
+const CharacterCustomizer = ({
+  isOpen,
+  onClose,
+  currentColors,
+  onSave,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  currentColors: CharacterColors;
+  onSave: (colors: CharacterColors) => void;
+}) => {
+  const [colors, setColors] = useState<CharacterColors>(currentColors);
+  const [activeTab, setActiveTab] = useState<"style" | "skin" | "hair" | "outfit" | "accessory">("style");
+
+  const handleSave = () => {
+    onSave(colors);
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.9, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.9, y: 20 }}
+        className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="p-4 border-b flex items-center justify-between bg-gradient-to-r from-primary/10 to-accent/10">
+          <h3 className="font-semibold flex items-center gap-2">
+            <Palette className="w-5 h-5 text-primary" />
+            Customize Character
+          </h3>
+          <button
+            onClick={onClose}
+            className="p-1 rounded-lg hover:bg-black/10 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Preview */}
+        <div className="p-6 flex justify-center bg-gradient-to-br from-secondary/30 to-secondary/10">
+          <PixelCharacter progress={50} level={1} colors={colors} />
+        </div>
+
+        {/* Tabs */}
+        <div className="flex border-b overflow-x-auto">
+          {(["style", "skin", "hair", "outfit", "accessory"] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={cn(
+                "flex-1 py-2 text-sm font-medium transition-colors capitalize whitespace-nowrap px-2",
+                activeTab === tab
+                  ? "text-primary border-b-2 border-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        {/* Color Options */}
+        <div className="p-4 space-y-4 max-h-[300px] overflow-y-auto">
+          {activeTab === "style" && (
+            <div>
+              <label className="text-sm font-medium mb-2 block">Body Style</label>
+              <div className="grid grid-cols-2 gap-3">
+                {BODY_STYLES.map((style) => (
+                  <button
+                    key={style.id}
+                    onClick={() => setColors({ ...colors, bodyStyle: style.id as "masculine" | "feminine" })}
+                    className={cn(
+                      "p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2",
+                      colors.bodyStyle === style.id
+                        ? "border-primary bg-primary/10 shadow-lg"
+                        : "border-border hover:border-primary/50"
+                    )}
+                  >
+                    <span className="text-3xl">{style.icon}</span>
+                    <span className="text-sm font-medium">{style.label}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {style.id === "masculine" ? "Pants outfit" : "Dress outfit"}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "skin" && (
+            <div>
+              <label className="text-sm font-medium mb-2 block">Skin Tone</label>
+              <div className="grid grid-cols-6 gap-2">
+                {SKIN_TONES.map((tone) => (
+                  <button
+                    key={tone.id}
+                    onClick={() => setColors({ ...colors, skinTone: tone.color })}
+                    className={cn(
+                      "w-10 h-10 rounded-lg border-2 transition-all",
+                      colors.skinTone === tone.color
+                        ? "border-primary scale-110 shadow-lg"
+                        : "border-transparent hover:border-border"
+                    )}
+                    style={{ backgroundColor: tone.color }}
+                    title={tone.label}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "hair" && (
+            <>
+              <div>
+                <label className="text-sm font-medium mb-2 block">Hair Style</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {HAIR_STYLES.map((style) => (
+                    <button
+                      key={style.id}
+                      onClick={() => setColors({ ...colors, hairStyle: style.id })}
+                      className={cn(
+                        "p-2 rounded-lg border-2 transition-all text-sm",
+                        colors.hairStyle === style.id
+                          ? "border-primary bg-primary/10"
+                          : "border-border hover:border-primary/50"
+                      )}
+                    >
+                      {style.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-2 block">Hair Color</label>
+                <div className="grid grid-cols-8 gap-2">
+                  {HAIR_COLORS.map((color) => (
+                    <button
+                      key={color.id}
+                      onClick={() => setColors({ ...colors, hairColor: color.color })}
+                      className={cn(
+                        "w-8 h-8 rounded-lg border-2 transition-all",
+                        colors.hairColor === color.color
+                          ? "border-primary scale-110 shadow-lg"
+                          : "border-transparent hover:border-border"
+                      )}
+                      style={{ backgroundColor: color.color }}
+                      title={color.label}
+                    />
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          {activeTab === "outfit" && (
+            <>
+              <div>
+                <label className="text-sm font-medium mb-2 block">Shirt Color</label>
+                <div className="grid grid-cols-8 gap-2">
+                  {SHIRT_COLORS.map((color) => (
+                    <button
+                      key={color.id}
+                      onClick={() => setColors({ ...colors, shirtColor: color.color })}
+                      className={cn(
+                        "w-8 h-8 rounded-lg border-2 transition-all",
+                        colors.shirtColor === color.color
+                          ? "border-primary scale-110 shadow-lg"
+                          : "border-transparent hover:border-border"
+                      )}
+                      style={{ backgroundColor: color.color }}
+                      title={color.label}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-2 block">Pants Color</label>
+                <div className="grid grid-cols-8 gap-2">
+                  {PANTS_COLORS.map((color) => (
+                    <button
+                      key={color.id}
+                      onClick={() => setColors({ ...colors, pantsColor: color.color })}
+                      className={cn(
+                        "w-8 h-8 rounded-lg border-2 transition-all",
+                        colors.pantsColor === color.color
+                          ? "border-primary scale-110 shadow-lg"
+                          : "border-transparent hover:border-border"
+                      )}
+                      style={{ backgroundColor: color.color }}
+                      title={color.label}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-2 block">Shoe Color</label>
+                <div className="grid grid-cols-8 gap-2">
+                  {[...HAIR_COLORS.slice(0, 5), { id: "white", color: "#E8E8E8", label: "White" }].map((color) => (
+                    <button
+                      key={color.id}
+                      onClick={() => setColors({ ...colors, shoeColor: color.color })}
+                      className={cn(
+                        "w-8 h-8 rounded-lg border-2 transition-all",
+                        colors.shoeColor === color.color
+                          ? "border-primary scale-110 shadow-lg"
+                          : "border-transparent hover:border-border"
+                      )}
+                      style={{ backgroundColor: color.color }}
+                      title={color.label}
+                    />
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          {activeTab === "accessory" && (
+            <div>
+              <label className="text-sm font-medium mb-2 block">Accessories</label>
+              <div className="grid grid-cols-4 gap-2">
+                {ACCESSORIES.map((acc) => (
+                  <button
+                    key={acc.id}
+                    onClick={() => setColors({ ...colors, accessory: acc.id === "none" ? undefined : acc.id })}
+                    className={cn(
+                      "p-3 rounded-lg border-2 transition-all flex flex-col items-center gap-1",
+                      (colors.accessory === acc.id || (!colors.accessory && acc.id === "none"))
+                        ? "border-primary bg-primary/10"
+                        : "border-border hover:border-primary/50"
+                    )}
+                  >
+                    <span className="text-xl">{acc.icon}</span>
+                    <span className="text-xs">{acc.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 border-t flex gap-2">
+          <Button variant="outline" onClick={onClose} className="flex-1">
+            Cancel
+          </Button>
+          <Button onClick={handleSave} className="flex-1">
+            Save Character
+          </Button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
 // XP Bar component
 const XPBar = ({ progress, xp, xpToNext }: { progress: number; xp: number; xpToNext: number }) => {
   return (
@@ -201,11 +719,41 @@ const XPBar = ({ progress, xp, xpToNext }: { progress: number; xp: number; xpToN
 };
 
 export function QuestTracker({ insights, completedTasks, onToggleTask, visitorId }: QuestTrackerProps) {
+  const [showCustomizer, setShowCustomizer] = useState(false);
+  
   // Get quest progress from Convex
   const questProgress = useQuery(
     api.quests.getQuestProgress,
     visitorId ? { visitorId } : "skip"
   );
+
+  // Get character customization from Convex
+  const characterCustomization = useQuery(
+    api.quests.getCharacterCustomization,
+    visitorId ? { visitorId } : "skip"
+  );
+  
+  const updateCharacterMutation = useMutation(api.quests.updateCharacterCustomization);
+
+  // Default character colors
+  const characterColors: CharacterColors = {
+    skinTone: characterCustomization?.skinTone ?? "#FFD5B8",
+    hairColor: characterCustomization?.hairColor ?? "#4A3728",
+    hairStyle: characterCustomization?.hairStyle ?? "short",
+    shirtColor: characterCustomization?.shirtColor ?? "#C4654A",
+    pantsColor: characterCustomization?.pantsColor ?? "#5B8C6E",
+    shoeColor: characterCustomization?.shoeColor ?? "#4A3728",
+    accessory: characterCustomization?.accessory,
+    bodyStyle: (characterCustomization?.bodyStyle as "masculine" | "feminine") ?? "masculine",
+  };
+
+  const handleSaveCharacter = async (colors: CharacterColors) => {
+    if (!visitorId) return;
+    await updateCharacterMutation({
+      visitorId,
+      ...colors,
+    });
+  };
 
   // Extract all tasks from insights
   const allTasks = useMemo(() => {
@@ -312,7 +860,12 @@ export function QuestTracker({ insights, completedTasks, onToggleTask, visitorId
       <CardContent className="space-y-4">
         {/* Character and Progress Section */}
         <div className="flex items-center gap-6 p-4 rounded-xl bg-gradient-to-br from-secondary/50 to-secondary/20 border border-border/50">
-          <PixelCharacter progress={progress} level={level} />
+          <PixelCharacter 
+            progress={progress} 
+            level={level} 
+            colors={characterColors}
+            onCustomize={() => setShowCustomizer(true)}
+          />
           
           <div className="flex-1 space-y-3">
             <div>
@@ -503,6 +1056,18 @@ export function QuestTracker({ insights, completedTasks, onToggleTask, visitorId
           </motion.div>
         )}
       </CardContent>
+
+      {/* Character Customization Modal */}
+      <AnimatePresence>
+        {showCustomizer && (
+          <CharacterCustomizer
+            isOpen={showCustomizer}
+            onClose={() => setShowCustomizer(false)}
+            currentColors={characterColors}
+            onSave={handleSaveCharacter}
+          />
+        )}
+      </AnimatePresence>
     </Card>
   );
 }

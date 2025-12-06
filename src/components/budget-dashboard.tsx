@@ -471,6 +471,354 @@ function AddTransactionDialog({
   );
 }
 
+// Edit Income/Expense Dialog
+function EditTransactionDialog({
+  type,
+  item,
+  onSave,
+  trigger,
+}: {
+  type: "income" | "expense";
+  item: IncomeSource | Expense;
+  onSave: (id: string, name: string, amount: number, category: string, frequency?: string) => void;
+  trigger: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState(item.name);
+  const [amount, setAmount] = useState(item.amount.toString());
+  const [category, setCategory] = useState<ExpenseCategory>(
+    type === "expense" ? (item as Expense).category : "other"
+  );
+  const [frequency, setFrequency] = useState<"weekly" | "biweekly" | "monthly" | "yearly">(
+    (item as IncomeSource).frequency || "monthly"
+  );
+
+  const handleSubmit = () => {
+    if (!name || !amount) return;
+
+    if (type === "income") {
+      onSave(item.id, name, parseFloat(amount), "other", frequency);
+    } else {
+      onSave(item.id, name, parseFloat(amount), category, frequency);
+    }
+
+    setOpen(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>
+            Edit {type === "income" ? "Income Source" : "Expense"}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 pt-4">
+          <div>
+            <label className="text-sm font-medium mb-1.5 block">Name</label>
+            <Input
+              placeholder={type === "income" ? "e.g., Salary" : "e.g., Rent"}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium mb-1.5 block">Amount</label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">RM</span>
+              <Input
+                type="number"
+                placeholder="0.00"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          {type === "expense" && (
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">Category</label>
+              <div className="grid grid-cols-4 gap-2">
+                {Object.entries(CATEGORY_CONFIG).slice(0, 8).map(([key, config]) => (
+                  <button
+                    key={key}
+                    onClick={() => setCategory(key as ExpenseCategory)}
+                    className={cn(
+                      "p-2 rounded-lg border-2 transition-all text-xs flex flex-col items-center gap-1",
+                      category === key
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/30"
+                    )}
+                  >
+                    <config.icon className="w-4 h-4" />
+                    {config.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div>
+            <label className="text-sm font-medium mb-1.5 block">Frequency</label>
+            <div className="grid grid-cols-4 gap-2">
+              {["weekly", "biweekly", "monthly", "yearly"].map((freq) => (
+                <button
+                  key={freq}
+                  onClick={() => setFrequency(freq as typeof frequency)}
+                  className={cn(
+                    "p-2 rounded-lg border-2 transition-all text-xs capitalize",
+                    frequency === freq
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/30"
+                  )}
+                >
+                  {freq}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <Button onClick={handleSubmit} className="w-full gradient-accent">
+            Save Changes
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// Edit Subscription Dialog
+function EditSubscriptionDialog({
+  subscription,
+  onSave,
+  trigger,
+}: {
+  subscription: Subscription;
+  onSave: (id: string, name: string, amount: number, frequency: string) => void;
+  trigger: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState(subscription.name);
+  const [amount, setAmount] = useState(subscription.amount.toString());
+  const [frequency, setFrequency] = useState<"weekly" | "monthly" | "yearly">(subscription.frequency);
+
+  const handleSubmit = () => {
+    if (!name || !amount) return;
+    onSave(subscription.id, name, parseFloat(amount), frequency);
+    setOpen(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Edit Subscription</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 pt-4">
+          <div>
+            <label className="text-sm font-medium mb-1.5 block">Service Name</label>
+            <Input
+              placeholder="e.g., Netflix, Spotify..."
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium mb-1.5 block">Amount</label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">RM</span>
+              <Input
+                type="number"
+                placeholder="0.00"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="text-sm font-medium mb-1.5 block">Billing Frequency</label>
+            <div className="grid grid-cols-3 gap-2">
+              {(["weekly", "monthly", "yearly"] as const).map((freq) => (
+                <button
+                  key={freq}
+                  onClick={() => setFrequency(freq)}
+                  className={cn(
+                    "p-2 rounded-lg border-2 transition-all text-xs capitalize",
+                    frequency === freq
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/30"
+                  )}
+                >
+                  {freq}
+                </button>
+              ))}
+            </div>
+          </div>
+          <Button onClick={handleSubmit} className="w-full gradient-accent">
+            Save Changes
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// Add Savings Goal Dialog
+function AddSavingsGoalDialog({
+  onAdd,
+  trigger,
+}: {
+  onAdd: (data: SavingsGoal) => void;
+  trigger: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [targetAmount, setTargetAmount] = useState("");
+  const [currentAmount, setCurrentAmount] = useState("");
+  const [monthlyContribution, setMonthlyContribution] = useState("");
+
+  const handleSubmit = () => {
+    if (!name || !targetAmount) return;
+
+    onAdd({
+      id: Date.now().toString(),
+      name,
+      targetAmount: parseFloat(targetAmount),
+      currentAmount: parseFloat(currentAmount) || 0,
+      monthlyContribution: parseFloat(monthlyContribution) || 0,
+    });
+
+    setName("");
+    setTargetAmount("");
+    setCurrentAmount("");
+    setMonthlyContribution("");
+    setOpen(false);
+  };
+
+  const GOAL_SUGGESTIONS = [
+    { name: "Emergency Fund", icon: "🏦", target: 10000 },
+    { name: "Vacation", icon: "✈️", target: 5000 },
+    { name: "New Car", icon: "🚗", target: 30000 },
+    { name: "Home Down Payment", icon: "🏠", target: 50000 },
+    { name: "Education", icon: "📚", target: 20000 },
+    { name: "Retirement", icon: "🌴", target: 100000 },
+  ];
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Target className="w-5 h-5 text-green-500" />
+            Add Savings Goal
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 pt-4">
+          {/* Quick Suggestions */}
+          <div>
+            <label className="text-sm font-medium mb-2 block">Quick Start</label>
+            <div className="grid grid-cols-3 gap-2">
+              {GOAL_SUGGESTIONS.slice(0, 6).map((suggestion) => (
+                <button
+                  key={suggestion.name}
+                  onClick={() => {
+                    setName(suggestion.name);
+                    setTargetAmount(suggestion.target.toString());
+                  }}
+                  className={cn(
+                    "p-2 rounded-lg border-2 transition-all text-xs flex flex-col items-center gap-1",
+                    name === suggestion.name
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/30"
+                  )}
+                >
+                  <span className="text-lg">{suggestion.icon}</span>
+                  <span className="truncate w-full text-center">{suggestion.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium mb-1.5 block">Goal Name</label>
+            <Input
+              placeholder="e.g., Emergency Fund, Vacation..."
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+          
+          <div>
+            <label className="text-sm font-medium mb-1.5 block">Target Amount</label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">RM</span>
+              <Input
+                type="number"
+                placeholder="10,000"
+                value={targetAmount}
+                onChange={(e) => setTargetAmount(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium mb-1.5 block">Current Savings (Optional)</label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">RM</span>
+              <Input
+                type="number"
+                placeholder="0"
+                value={currentAmount}
+                onChange={(e) => setCurrentAmount(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">How much have you saved so far?</p>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium mb-1.5 block">Monthly Contribution</label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">RM</span>
+              <Input
+                type="number"
+                placeholder="500"
+                value={monthlyContribution}
+                onChange={(e) => setMonthlyContribution(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">How much will you save each month?</p>
+          </div>
+
+          {/* Preview */}
+          {targetAmount && monthlyContribution && parseFloat(monthlyContribution) > 0 && (
+            <div className="p-3 rounded-lg bg-green-50 border border-green-200">
+              <p className="text-sm text-green-700">
+                🎯 At RM{parseFloat(monthlyContribution).toLocaleString()}/month, you&apos;ll reach your goal in{" "}
+                <span className="font-semibold">
+                  {Math.ceil((parseFloat(targetAmount) - (parseFloat(currentAmount) || 0)) / parseFloat(monthlyContribution))} months
+                </span>
+              </p>
+            </div>
+          )}
+
+          <Button onClick={handleSubmit} className="w-full gradient-accent">
+            <Target className="w-4 h-4 mr-2" />
+            Create Goal
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // Add Subscription Dialog
 function AddSubscriptionDialog({
   onAdd,
@@ -769,10 +1117,37 @@ export function BudgetDashboard({
     });
   };
 
+  const handleEditIncome = (id: string, name: string, amount: number, frequency: string) => {
+    onUpdateBudget({
+      ...budgetData,
+      income: budgetData.income.map((i) =>
+        i.id === id ? { ...i, name, amount, frequency: frequency as IncomeSource["frequency"] } : i
+      ),
+    });
+  };
+
   const handleDeleteExpense = (id: string) => {
     onUpdateBudget({
       ...budgetData,
       expenses: budgetData.expenses.filter((e) => e.id !== id),
+    });
+  };
+
+  const handleEditExpense = (id: string, name: string, amount: number, category: string, frequency?: string) => {
+    onUpdateBudget({
+      ...budgetData,
+      expenses: budgetData.expenses.map((e) =>
+        e.id === id ? { ...e, name, amount, category: category as ExpenseCategory, frequency: frequency as Expense["frequency"] } : e
+      ),
+    });
+  };
+
+  const handleEditSubscription = (id: string, name: string, amount: number, frequency: string) => {
+    onUpdateBudget({
+      ...budgetData,
+      subscriptions: budgetData.subscriptions.map((s) =>
+        s.id === id ? { ...s, name, amount, frequency: frequency as Subscription["frequency"] } : s
+      ),
     });
   };
 
@@ -790,25 +1165,10 @@ export function BudgetDashboard({
     });
   };
 
-  const handleAddSavingsGoal = () => {
-    const name = prompt("Goal name (e.g., Emergency Fund):");
-    if (!name) return;
-    const target = parseFloat(prompt("Target amount:") || "0");
-    if (target <= 0) return;
-    const monthly = parseFloat(prompt("Monthly contribution:") || "0");
-
+  const handleAddSavingsGoal = (goal: SavingsGoal) => {
     onUpdateBudget({
       ...budgetData,
-      savingsGoals: [
-        ...budgetData.savingsGoals,
-        {
-          id: Date.now().toString(),
-          name,
-          targetAmount: target,
-          currentAmount: 0,
-          monthlyContribution: monthly,
-        },
-      ],
+      savingsGoals: [...budgetData.savingsGoals, goal],
     });
   };
 
@@ -873,22 +1233,20 @@ export function BudgetDashboard({
           >
             <Card className="bg-white/60 backdrop-blur-sm border-border/50">
               <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">{stat.label}</p>
-                    <p className={cn("text-2xl font-semibold mt-1", stat.color)}>
-                      {stat.isPercent 
-                        ? `${stat.value.toFixed(1)}%`
-                        : `RM${Math.abs(stat.value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                      }
-                      {!stat.isPercent && stat.value < 0 && (
-                        <span className="text-sm ml-1">(deficit)</span>
-                      )}
-                    </p>
-                  </div>
-                  <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center", stat.bgColor)}>
+                <div className="flex flex-col items-center text-center">
+                  <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center mb-3", stat.bgColor)}>
                     <stat.icon className={cn("w-6 h-6", stat.color)} />
                   </div>
+                  <p className={cn("text-2xl font-semibold", stat.color)}>
+                    {stat.isPercent 
+                      ? `${stat.value.toFixed(1)}%`
+                      : `RM${Math.abs(stat.value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                    }
+                    {!stat.isPercent && stat.value < 0 && (
+                      <span className="text-sm ml-1">(deficit)</span>
+                    )}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
                 </div>
               </CardContent>
             </Card>
@@ -972,6 +1330,22 @@ export function BudgetDashboard({
                             <span className="font-semibold text-green-600">
                               RM{income.amount.toLocaleString()}
                             </span>
+                            <EditTransactionDialog
+                              type="income"
+                              item={income}
+                              onSave={(id, name, amount, _, frequency) => 
+                                handleEditIncome(id, name, amount, frequency || "monthly")
+                              }
+                              trigger={
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-muted-foreground hover:text-primary"
+                                >
+                                  <Edit2 className="w-4 h-4" />
+                                </Button>
+                              }
+                            />
                             <Button
                               variant="ghost"
                               size="icon"
@@ -1039,6 +1413,22 @@ export function BudgetDashboard({
                                 <span className="font-semibold text-red-500">
                                   -RM{expense.amount.toLocaleString()}
                                 </span>
+                                <EditTransactionDialog
+                                  type="expense"
+                                  item={expense}
+                                  onSave={(id, name, amount, category, frequency) => 
+                                    handleEditExpense(id, name, amount, category, frequency)
+                                  }
+                                  trigger={
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 text-muted-foreground hover:text-primary"
+                                    >
+                                      <Edit2 className="w-4 h-4" />
+                                    </Button>
+                                  }
+                                />
                                 <Button
                                   variant="ghost"
                                   size="icon"
@@ -1182,6 +1572,21 @@ export function BudgetDashboard({
                               </Badge>
                             )}
                           </div>
+                          <EditSubscriptionDialog
+                            subscription={sub}
+                            onSave={(id, name, amount, frequency) => 
+                              handleEditSubscription(id, name, amount, frequency)
+                            }
+                            trigger={
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-muted-foreground hover:text-primary"
+                              >
+                                <Edit2 className="w-4 h-4" />
+                              </Button>
+                            }
+                          />
                           <Button
                             variant="ghost"
                             size="icon"
@@ -1217,15 +1622,15 @@ export function BudgetDashboard({
                       <Target className="w-5 h-5 text-green-500" />
                       Savings Goals
                     </CardTitle>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleAddSavingsGoal}
-                      className="gap-1"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Add Goal
-                    </Button>
+                    <AddSavingsGoalDialog
+                      onAdd={handleAddSavingsGoal}
+                      trigger={
+                        <Button variant="outline" size="sm" className="gap-1">
+                          <Plus className="w-4 h-4" />
+                          Add Goal
+                        </Button>
+                      }
+                    />
                   </div>
                 </CardHeader>
                 <CardContent>

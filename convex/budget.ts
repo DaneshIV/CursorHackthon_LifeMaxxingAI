@@ -330,3 +330,82 @@ export const deleteIncome = mutation({
   },
 });
 
+// Edit income
+export const editIncome = mutation({
+  args: {
+    visitorId: v.string(),
+    incomeId: v.string(),
+    name: v.string(),
+    amount: v.number(),
+    frequency: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("budgetData")
+      .withIndex("by_visitor", (q) => q.eq("visitorId", args.visitorId))
+      .first();
+
+    if (existing) {
+      const updatedIncome = existing.income.map((i) =>
+        i.id === args.incomeId
+          ? { ...i, name: args.name, amount: args.amount, frequency: args.frequency }
+          : i
+      );
+      await ctx.db.patch(existing._id, { income: updatedIncome });
+    }
+  },
+});
+
+// Edit expense
+export const editExpense = mutation({
+  args: {
+    visitorId: v.string(),
+    expenseId: v.string(),
+    name: v.string(),
+    amount: v.number(),
+    category: v.string(),
+    frequency: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("budgetData")
+      .withIndex("by_visitor", (q) => q.eq("visitorId", args.visitorId))
+      .first();
+
+    if (existing) {
+      const updatedExpenses = existing.expenses.map((e) =>
+        e.id === args.expenseId
+          ? { ...e, name: args.name, amount: args.amount, category: args.category, frequency: args.frequency }
+          : e
+      );
+      await ctx.db.patch(existing._id, { expenses: updatedExpenses });
+    }
+  },
+});
+
+// Edit subscription
+export const editSubscription = mutation({
+  args: {
+    visitorId: v.string(),
+    subscriptionId: v.string(),
+    name: v.string(),
+    amount: v.number(),
+    frequency: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("budgetData")
+      .withIndex("by_visitor", (q) => q.eq("visitorId", args.visitorId))
+      .first();
+
+    if (existing) {
+      const updatedSubscriptions = existing.subscriptions.map((s) =>
+        s.id === args.subscriptionId
+          ? { ...s, name: args.name, amount: args.amount, frequency: args.frequency }
+          : s
+      );
+      await ctx.db.patch(existing._id, { subscriptions: updatedSubscriptions });
+    }
+  },
+});
+

@@ -118,3 +118,62 @@ export const resetProgress = mutation({
   },
 });
 
+// Character customization
+export const getCharacterCustomization = query({
+  args: { visitorId: v.string() },
+  handler: async (ctx, args) => {
+    const customization = await ctx.db
+      .query("characterCustomization")
+      .withIndex("by_visitor", (q) => q.eq("visitorId", args.visitorId))
+      .first();
+    
+    // Return defaults if no customization exists
+    return customization || {
+      visitorId: args.visitorId,
+      skinTone: "#FFD5B8",
+      hairColor: "#4A3728",
+      hairStyle: "short",
+      shirtColor: "#C4654A",
+      pantsColor: "#5B8C6E",
+      shoeColor: "#4A3728",
+      accessory: undefined,
+      bodyStyle: "masculine",
+    };
+  },
+});
+
+export const updateCharacterCustomization = mutation({
+  args: {
+    visitorId: v.string(),
+    skinTone: v.string(),
+    hairColor: v.string(),
+    hairStyle: v.string(),
+    shirtColor: v.string(),
+    pantsColor: v.string(),
+    shoeColor: v.string(),
+    accessory: v.optional(v.string()),
+    bodyStyle: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("characterCustomization")
+      .withIndex("by_visitor", (q) => q.eq("visitorId", args.visitorId))
+      .first();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        skinTone: args.skinTone,
+        hairColor: args.hairColor,
+        hairStyle: args.hairStyle,
+        shirtColor: args.shirtColor,
+        pantsColor: args.pantsColor,
+        shoeColor: args.shoeColor,
+        accessory: args.accessory,
+        bodyStyle: args.bodyStyle,
+      });
+    } else {
+      await ctx.db.insert("characterCustomization", args);
+    }
+  },
+});
+

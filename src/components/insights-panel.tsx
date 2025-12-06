@@ -159,31 +159,19 @@ ${insight.nextSteps.map((step, i) => `${i + 1}. ${step}`).join("\n")}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
           >
-            <Card className="bg-white/60 backdrop-blur-sm border-border/50 card-hover overflow-hidden">
-              <CardContent className="pt-6 relative">
+            <Card className="bg-white/60 backdrop-blur-sm border-border/50">
+              <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">{stat.label}</p>
-                    <motion.p 
-                      className="text-3xl font-semibold mt-1"
-                      key={stat.value}
-                      initial={{ scale: 1.2, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                    >
+                    <p className={cn("text-2xl font-semibold mt-1", stat.color)}>
                       {stat.value}
-                    </motion.p>
+                    </p>
                   </div>
-                  <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center", stat.bgColor, stat.color)}>
-                    <stat.icon className="w-6 h-6" />
+                  <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center", stat.bgColor)}>
+                    <stat.icon className={cn("w-6 h-6", stat.color)} />
                   </div>
                 </div>
-                {/* Decorative gradient */}
-                <div className={cn("absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r opacity-50", 
-                  stat.label === "Urgent" ? "from-red-400 to-red-600" :
-                  stat.label === "Important" ? "from-amber-400 to-amber-600" :
-                  stat.label === "Action Items" ? "from-green-400 to-green-600" :
-                  "from-primary to-primary/60"
-                )} />
               </CardContent>
             </Card>
           </motion.div>
