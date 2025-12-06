@@ -95,6 +95,7 @@ export default function Home() {
       ...e,
       category: e.category as "housing" | "utilities" | "food" | "transport" | "healthcare" | "entertainment" | "shopping" | "subscriptions" | "debt" | "other",
       frequency: e.frequency as "weekly" | "biweekly" | "monthly" | "yearly" | undefined,
+      date: e.dueDate || new Date().toISOString().split('T')[0],
     })),
     subscriptions: budgetDataQuery.subscriptions.map(s => ({
       ...s,
