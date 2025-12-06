@@ -3,6 +3,7 @@
 # dependencies
 /node_modules
 /.pnp
+/convex
 .pnp.*
 .yarn/*
 !.yarn/patches
